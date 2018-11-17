@@ -32,8 +32,8 @@ class Database:
                 sql="SELECT user_password FROM userdetails where user_username=%s"
                 self.cursorInstance.execute(sql,_email);
                 hashedData = self.cursorInstance.fetchall()
-                print(hashedData[0]['user_password'])
                 checkUserDetails = check_password_hash(hashedData[0]['user_password'], _password)
+                print(checkUserDetails)
                 return checkUserDetails
             else:
                 return json.dumps({'html':'<span>Enter the required fields</span>'})
@@ -103,17 +103,26 @@ def showSignIn():
 # Block for Sign In - Perform SignIn action with password check
 @app.route('/signIn',methods=['POST'])
 def signIn():
-     try:
-        _email = request.form['inputEmail']
-        _password = request.form['inputPassword']
-        db = Database()
-        details = db.checkUser(_email,_password);
-        if 'Username Exists !!' in details[0]:
-             raise ValueError('User already exists')
-        else:
-            return json.dumps({'message':'User logged in successfully !'})
-     except Exception as e:
-        return json.dumps({'error':str(e)})
+     _email = request.form['inputEmail']
+     _password = request.form['inputPassword']
+     db = Database()
+     details = db.checkUser(_email,_password);
+     if details!=True:
+         raise InvalidUsage('User does not exists', status_code=410) 
+     else: 
+        return json.dumps({'message':'User logged in successfully !'})
+    
+#    try:
+#        _email = request.form['inputEmail']
+#        _password = request.form['inputPassword']
+#        db = Database()
+#        details = db.checkUser(_email,_password);
+#        if 'Username Exists !!' in details[0]:
+#             raise InvalidUsage('User does not exists', status_code=410) 
+#        else:
+#            return json.dumps({'message':'User logged in successfully !'})
+#     except Exception as e:
+#        return json.dumps({'error':str(e)})
  
 @app.route('/getAllCustomers')
 def employees():
@@ -145,5 +154,9 @@ if __name__ == '__main__':
     app.run(debug = True)
 #    db = Database()
 #    details = db.callSPUser('abiram','ursabi@gmail.com','logmein123');
-#    print(details)
+#    details = db.checkUser('ursabi@gmail.com','logmein123');
+#    if details!=True:
+#        raise InvalidUsage('User does not exists', status_code=410) 
+#    else: 
+#        print('User logged in')
    

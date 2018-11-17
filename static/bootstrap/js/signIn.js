@@ -6,10 +6,11 @@ $(function() {
             type: 'POST',
             success: function(response) {
                 console.log(response);
-                window.location.replace('userhomepage')
+                window.location.replace('getAllCustomers')
             },
             error: function(error) {
                 console.log(error);
+                alert('Username / password does not match');
             }
         });
     });
